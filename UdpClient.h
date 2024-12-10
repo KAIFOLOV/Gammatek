@@ -12,11 +12,17 @@ public:
     explicit UdpClient(QObject *parent = nullptr);
 
     Q_SIGNAL void serverInfoReceived(const QString &serverIp, quint16 serverPort);
-    Q_SLOT void onDatagramReceived();
 
-    void startListening(const quint16 port);
+    Q_SLOT void onDatagramReceived();
+    Q_SLOT void resumeBroadcast();
+
+    void startListening();
+    void pauseBroadcast();
+
+    void setUdpPort(const quint16 newUdpPort);
 
 private:
+    quint16 _udpPort;
     QPointer<QUdpSocket> _udpSocket;
 };
 

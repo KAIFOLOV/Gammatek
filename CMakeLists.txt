@@ -72,10 +72,10 @@ foreach(_target Client Server)
 
   if(_target STREQUAL "Server")
     target_sources(${_target} PRIVATE
-    MaintainingService.h
     ServerWidget.h ServerWidget.cpp
     ServerLogic.h ServerLogic.cpp
-    GrpcServer.h GrpcServer.cpp)
+    GrpcServer.h GrpcServer.cpp
+    UdpServer.h UdpServer.cpp)
 
   elseif(_target STREQUAL "Client")
     target_sources(${_target} PRIVATE

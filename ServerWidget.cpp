@@ -35,6 +35,9 @@ ServerWidget::ServerWidget(QWidget *parent) :
         _startButton = new QPushButton(tr("Start"), this);
         buttonLayout->addWidget(_startButton);
 
+        _grpcStartButton = new QPushButton(tr("Start Grpc"), this);
+        buttonLayout->addWidget(_grpcStartButton);
+
         _stopButton = new QPushButton(tr("Stop"), this);
         buttonLayout->addWidget(_stopButton);
 
@@ -44,6 +47,7 @@ ServerWidget::ServerWidget(QWidget *parent) :
     setLayout(mainLayout);
 
     connect(_startButton, &QPushButton::clicked, this, &ServerWidget::onStartClicked);
+    connect(_grpcStartButton, &QPushButton::clicked, this, &ServerWidget::startGrpc);
     connect(_stopButton, &QPushButton::clicked, this, &ServerWidget::stopBroadcast);
 }
 

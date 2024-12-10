@@ -2,6 +2,7 @@
 #define SERVERLOGIC_H
 
 #include "GrpcServer.h"
+#include "UdpServer.h"
 
 #include <QObject>
 #include <QUdpSocket>
@@ -12,39 +13,28 @@ class ServerLogic : public QObject
 {
     Q_OBJECT
 public:
-    explicit ServerLogic(QPointer<QUdpSocket> udpSocket,
-                         GrpcServer * grpcServer,
+    explicit ServerLogic(QPointer<GrpcServer> grpcServer,
+                         QPointer<UdpServer> udpServer,
                          QObject *parent = nullptr);
     ~ServerLogic();
 
     Q_SIGNAL void logMessage(const QString &message);
+    Q_SLOT void appendToLog(const QString &message);
 
-    Q_SLOT void startBroadcast(const quint16 port);
-    Q_SLOT void stopBroadcast();
-    Q_SLOT void sendBroadcastMessage();
+    void startGrpcServer();
+    void stopGrpcServer();
 
-    void sendPingResponseToClient(const QHostAddress &clientAddress, const quint16 clientPort);
-
-    void setUdpSocket(QPointer<QUdpSocket> newUdpSocket);
+    void startUdpBroadcast(const quint16 serverPort);
+    void stopUdpBroadcast();
 
 private:
-    void appendToLog(const QString &message);
-    QString getLocalIPAddress();
-
-    QPointer<QUdpSocket> _udpSocket;
-    QPointer<QTimer> _broadcastTimer;
-    GrpcServer *_grpcServer;
-
-    QHash<QHostAddress, quint16> _clientConnections; // Подключенные клиенты
-    QHash<QHostAddress, QPointer<QTimer>> _clientTimers; // Таймеры для пинга
+    QPointer<GrpcServer> _grpcServer;
+    QPointer<UdpServer> _udpServer;
 
     QPointer<QFile> _logFile;
     QTextStream _logStream;
 
     bool _isBroadcasting = false;
-    quint16 _broadcastPort = 10001;
-    QString _serverIp = "127.0.0.1";
-    quint16 _serverPort = 50051;
 };
 
 #endif // SERVERLOGIC_H

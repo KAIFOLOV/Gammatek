@@ -19,6 +19,7 @@ public:
     ~ServerWidget();
 
     Q_SIGNAL void startBroadcast(const quint16 port);
+    Q_SIGNAL void startGrpc();
     Q_SIGNAL void stopBroadcast();
 
     Q_SLOT void onStartClicked();
@@ -27,7 +28,9 @@ public:
 private:
     QPointer<QLineEdit> _portLineEdit;
     QPointer<QTextEdit> _logTextEdit;
+
     QPointer<QPushButton> _startButton;
+    QPointer<QPushButton> _grpcStartButton;
     QPointer<QPushButton> _stopButton;
 
     QPointer<QSettings> _settings;

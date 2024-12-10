@@ -4,7 +4,16 @@
 #include <QString>
 #include <QThread>
 
+#include "api.grpc.pb.h"
+
 #include <grpcpp/grpcpp.h>
+
+class MaintainingServiceImpl final : public MaintainingApi::Service
+{
+public:
+    grpc::Status
+    Ping(grpc::ServerContext *context, const PingRequest *request, PingResponse *response) override;
+};
 
 class GrpcServer : public QThread
 {
@@ -13,6 +22,8 @@ class GrpcServer : public QThread
 public:
     GrpcServer();
 
+    Q_SIGNAL void logMessage(const QString &message);
+
     void setServerIp(const QString &newServerIp);
     void setServerPort(quint16 newServerPort);
 
@@ -20,8 +31,12 @@ protected:
     void run() override;
 
 private:
-    QString _serverIp;
-    quint16 _serverPort;
+    QString _serverIp { "127.0.0.1" };
+    QString _clientIp;
+    quint16 _serverPort { 50001 };
+
+    std::shared_ptr<grpc::Channel> _channel;
+    std::unique_ptr<MaintainingApi::Stub> _stub;
     std::unique_ptr<grpc::Server> _server;
 };
 

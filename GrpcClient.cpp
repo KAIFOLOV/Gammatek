@@ -2,26 +2,30 @@
 
 #include <QDebug>
 
-GrpcClient::GrpcClient(QObject *parent) : QObject { parent }
-{}
+GrpcClient::GrpcClient(QObject *parent) : QObject { parent }, _pingTimer { new QTimer(this) }
+{
+    _pingTimer->setInterval(5000);
+    connect(_pingTimer, &QTimer::timeout, this, &GrpcClient::pingServer);
+}
 
-void GrpcClient::connectToServer(const QString &serverIp, quint16 serverPort)
+void GrpcClient::connectToServer(const QString &serverIp, const quint16 serverPort)
 {
     if (_isGrpcConnected) {
         qInfo() << "Already connected to gRPC server.";
+        emit stopBroadcast();
         return;
     }
 
-    // Формируем адрес для gRPC
     QString grpcAddress = serverIp + ":" + QString::number(serverPort);
     qInfo() << "Connecting to gRPC server at" << grpcAddress;
 
-    // Создаем канал подключения с сервером
     _channel = grpc::CreateChannel(grpcAddress.toStdString(), grpc::InsecureChannelCredentials());
-    _stub = MaintainingApi::MaintainingApi::NewStub(
-     _channel); // Используем сгенерированный Stub внутри пространства имен MaintainingApi
+    _stub = MaintainingApi::MaintainingApi::NewStub(_channel);
 
     _isGrpcConnected = true;
+
+    _pingFailureCount = 0;
+    _pingTimer->start();
 }
 
 void GrpcClient::pingServer()
@@ -32,7 +36,7 @@ void GrpcClient::pingServer()
     }
 
     PingRequest pingRequest;
-    pingRequest.set_clientip("clientIp");
+    pingRequest.set_clientip("1");
 
     PingResponse pingResponse;
     grpc::ClientContext context;
@@ -41,7 +45,20 @@ void GrpcClient::pingServer()
 
     if (status.ok()) {
         qInfo() << "Ping response:" << pingResponse.response().c_str();
+
+        _pingFailureCount = 0;
+
+        emit pingResponseReceived(pingResponse.response().c_str());
     } else {
-        qCritical() << "gRPC call failed:" << status.error_message().c_str();
+        qWarning() << "gRPC call failed:" << status.error_message().c_str();
+
+        _pingFailureCount++;
+
+        if (_pingFailureCount >= 3) {
+            qWarning() << "3 consecutive ping failures. Stopping ping cycle.";
+            _pingTimer->stop();
+            emit resumeBroadcast();
+            _isGrpcConnected = false;
+        }
     }
 }

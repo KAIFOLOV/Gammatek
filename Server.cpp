@@ -9,20 +9,30 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QPointer<QUdpSocket> udpSocket = new QUdpSocket();
-    GrpcServer *grpcServer = new GrpcServer();
+    QPointer<GrpcServer> grpcServer = new GrpcServer();
+    QPointer<UdpServer> udpServer = new UdpServer();
 
     QPointer<ServerWidget> serverWidget = new ServerWidget();
-    std::unique_ptr<ServerLogic> serverLogic = std::make_unique<ServerLogic>(udpSocket, grpcServer);
+
+    std::unique_ptr<ServerLogic> serverLogic = std::make_unique<ServerLogic>(grpcServer, udpServer);
+
+    QObject::connect(grpcServer, &GrpcServer::logMessage, serverLogic.get(),
+                     &ServerLogic::appendToLog);
+
+    QObject::connect(udpServer, &UdpServer::logMessage, serverLogic.get(),
+                     &ServerLogic::appendToLog);
 
     QObject::connect(serverLogic.get(), &ServerLogic::logMessage, serverWidget,
                      &ServerWidget::appendToLog);
 
     QObject::connect(serverWidget, &ServerWidget::startBroadcast, serverLogic.get(),
-                     &ServerLogic::startBroadcast);
+                     &ServerLogic::startUdpBroadcast);
+
+    QObject::connect(serverWidget, &ServerWidget::startGrpc, serverLogic.get(),
+                     &ServerLogic::startGrpcServer);
 
     QObject::connect(serverWidget, &ServerWidget::stopBroadcast, serverLogic.get(),
-                     &ServerLogic::stopBroadcast);
+                     &ServerLogic::stopUdpBroadcast);
 
     serverWidget->show();
 

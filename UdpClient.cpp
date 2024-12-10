@@ -5,14 +5,14 @@ UdpClient::UdpClient(QObject *parent) : QObject(parent), _udpSocket { new QUdpSo
     connect(_udpSocket, &QUdpSocket::readyRead, this, &UdpClient::onDatagramReceived);
 }
 
-void UdpClient::startListening(const quint16 port)
+void UdpClient::startListening()
 {
-    if (!_udpSocket->bind(QHostAddress::LocalHost, port, QUdpSocket::ShareAddress)) {
-        qCritical() << "Failed to bind UDP socket to port" << port;
+    if (!_udpSocket->bind(QHostAddress::Any, _udpPort, QUdpSocket::ShareAddress)) {
+        qCritical() << "Failed to bind UDP socket to port" << _udpPort;
         return;
     }
 
-    qInfo() << "Listening on UDP port" << port;
+    qInfo() << "Listening on UDP port" << _udpPort;
 }
 
 void UdpClient::onDatagramReceived()
@@ -26,7 +26,6 @@ void UdpClient::onDatagramReceived()
         _udpSocket->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort);
 
         QString message = QString::fromUtf8(datagram);
-        qInfo() << "Received datagram:" << message;
 
         QStringList parts = message.split(":");
         if (parts.size() == 2) {
@@ -38,4 +37,25 @@ void UdpClient::onDatagramReceived()
             qWarning() << "Invalid datagram format received!";
         }
     }
+}
+
+void UdpClient::pauseBroadcast()
+{
+    qInfo() << "Pausing broadcast for";
+    _udpSocket->close();
+}
+
+void UdpClient::resumeBroadcast()
+{
+    qInfo() << "Resuming broadcast.";
+    delete _udpSocket;
+    _udpSocket = new QUdpSocket(this);
+
+    connect(_udpSocket, &QUdpSocket::readyRead, this, &UdpClient::onDatagramReceived);
+    startListening();
+}
+
+void UdpClient::setUdpPort(const quint16 newUdpPort)
+{
+    _udpPort = newUdpPort;
 }
