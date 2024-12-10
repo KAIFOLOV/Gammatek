@@ -68,15 +68,21 @@ target_link_libraries(grpc_proto
   ${_PROTOBUF_LIBPROTOBUF})
 
 foreach(_target Client Server)
-  add_executable(${_target} "${_target}.cpp")
+    add_executable(${_target} "${_target}.cpp")
 
   if(_target STREQUAL "Server")
     target_sources(${_target} PRIVATE
+    MaintainingService.h
     ServerWidget.h ServerWidget.cpp
-    ServerLogic.h ServerLogic.cpp)
+    ServerLogic.h ServerLogic.cpp
+    GrpcServer.h GrpcServer.cpp)
 
   elseif(_target STREQUAL "Client")
-    target_sources(${_target} PRIVATE ClientWidget.h ClientWidget.cpp)
+    target_sources(${_target} PRIVATE
+        ClientWidget.h ClientWidget.cpp
+        UdpClient.h UdpClient.cpp
+        ClientLogic.h ClientLogic.cpp
+        GrpcClient.h GrpcClient.cpp)
   endif()
 
   target_link_libraries(${_target}

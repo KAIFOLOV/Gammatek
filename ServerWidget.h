@@ -18,7 +18,7 @@ public:
     explicit ServerWidget(QWidget *parent = nullptr);
     ~ServerWidget();
 
-    Q_SIGNAL void startBroadcast(const int port);
+    Q_SIGNAL void startBroadcast(const quint16 port);
     Q_SIGNAL void stopBroadcast();
 
     Q_SLOT void onStartClicked();

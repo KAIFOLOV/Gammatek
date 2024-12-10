@@ -43,8 +43,6 @@ ServerWidget::ServerWidget(QWidget *parent) :
 
     setLayout(mainLayout);
 
-    qInfo() << "ServerWidget constructor called!";
-
     connect(_startButton, &QPushButton::clicked, this, &ServerWidget::onStartClicked);
     connect(_stopButton, &QPushButton::clicked, this, &ServerWidget::stopBroadcast);
 }
@@ -63,11 +61,7 @@ void ServerWidget::onStartClicked()
 
     _settings->setValue("server_port", port);
 
-    appendToLog(tr("Starting server..."));
-
     emit startBroadcast(port);
-
-    appendToLog(tr("Server successfully started on port: ") + QString::number(port));
 }
 
 void ServerWidget::appendToLog(const QString &message)
