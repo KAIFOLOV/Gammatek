@@ -82,7 +82,8 @@ foreach(_target Client Server)
         ClientWidget.h ClientWidget.cpp
         UdpClient.h UdpClient.cpp
         ClientLogic.h ClientLogic.cpp
-        GrpcClient.h GrpcClient.cpp)
+        GrpcClient.h GrpcClient.cpp
+        TableModel.h TableModel.cpp)
   endif()
 
   target_link_libraries(${_target}

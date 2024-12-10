@@ -6,8 +6,8 @@ grpc::Status MaintainingServiceImpl::Ping(grpc::ServerContext *context,
                                           const PingRequest *request,
                                           PingResponse *response)
 {
-    std::string client_ip = context->peer(); // IP клиента
-    qInfo() << "New client connection detected:" << QString::fromStdString(client_ip);
+    std::string client_ip = context->peer();
+    qInfo() << "Send Ping Responce to client:" << QString::fromStdString(client_ip);
 
     std::string responseMessage = "1";
 
