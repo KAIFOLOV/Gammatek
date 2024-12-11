@@ -1,5 +1,5 @@
-#ifndef GRPCCLIENT_H
-#define GRPCCLIENT_H
+#ifndef GRPCDEVICE_H
+#define GRPCDEVICE_H
 
 #include <QObject>
 #include <QPointer>
@@ -8,12 +8,12 @@
 #include <grpcpp/grpcpp.h>
 #include "api.grpc.pb.h"
 
-class GrpcClient : public QObject
+class GrpcDevice : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit GrpcClient(QObject *parent = nullptr);
+    explicit GrpcDevice(QObject *parent = nullptr);
 
     Q_SIGNAL void connectionStateChanged();
     Q_SIGNAL void lastPingTimeChanged();
@@ -48,4 +48,4 @@ private:
     QString _lastPingTime { "-" };
 };
 
-#endif // GRPCCLIENT_H
+#endif // GRPCDEVICE_H

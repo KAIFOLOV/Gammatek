@@ -33,8 +33,6 @@ private:
 
     QPointer<QFile> _logFile;
     QTextStream _logStream;
-
-    bool _isBroadcasting = false;
 };
 
 #endif // SERVERLOGIC_H

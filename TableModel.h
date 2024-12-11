@@ -1,20 +1,11 @@
 #ifndef TABLEMODEL_H
 #define TABLEMODEL_H
 
-#include "GrpcClient.h"
+#include "GrpcDevice.h"
 
 #include <QAbstractTableModel>
 #include <QPushButton>
 #include <QPointer>
-
-struct Server
-{
-    QString ip;
-    quint16 port;
-    QString lastPingTime;
-    QString status;
-    QPointer<QTimer> pingTimer;
-};
 
 class TableModel : public QAbstractTableModel
 {
@@ -30,11 +21,10 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
     void addServer(const QString &ip, const quint16 port);
-
-    QPointer<GrpcClient> getServer(const int row) const;
+    QPointer<GrpcDevice> getServer(const int row) const;
 
 private:
-    QList<QPointer<GrpcClient>> _servers;
+    QList<QPointer<GrpcDevice>> _servers;
 };
 
 #endif // TABLEMODEL_H

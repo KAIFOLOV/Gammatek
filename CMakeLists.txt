@@ -16,7 +16,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Network)
 # Protobuf
 option(protobuf_MODULE_COMPATIBLE TRUE)
 find_package(Protobuf CONFIG REQUIRED)
-message(STATUS "gRPC_FOUND: ${gRPC_FOUND}")
+message(STATUS "Protobuf_FOUND: ${Protobuf_FOUND}")
 message(STATUS "Protobuf ${Protobuf_VERSION}")
 
 set(_PROTOBUF_LIBPROTOBUF protobuf::libprotobuf)
@@ -25,7 +25,7 @@ find_program(_PROTOBUF_PROTOC protoc REQUIRED)
 
 # gRPC
 find_package(gRPC CONFIG REQUIRED)
-message(STATUS "Protobuf_FOUND: ${Protobuf_FOUND}")
+message(STATUS "gRPC_FOUND: ${gRPC_FOUND}")
 message(STATUS "Using gRPC ${gRPC_VERSION}")
 
 set(_GRPC_GRPCPP gRPC::grpc++)
@@ -82,7 +82,7 @@ foreach(_target Client Server)
         ClientWidget.h ClientWidget.cpp
         UdpClient.h UdpClient.cpp
         ClientLogic.h ClientLogic.cpp
-        GrpcClient.h GrpcClient.cpp
+        GrpcDevice.h GrpcDevice.cpp
         TableModel.h TableModel.cpp
         ButtonDelegate.h ButtonDelegate.cpp)
   endif()
@@ -100,9 +100,3 @@ foreach(_target Client Server)
     ${_GRPC_GRPCPP}
     ${_PROTOBUF_LIBPROTOBUF})
 endforeach()
-
-# include(GNUInstallDirs)
-# install(TARGETS Server_Gammatek
-#     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-# )

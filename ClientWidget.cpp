@@ -27,7 +27,7 @@ ClientWidget::ClientWidget(QPointer<TableModel> tableModel, QWidget *parent) :
 void ClientWidget::onButtonClicked(const QModelIndex &index, const QString &text)
 {
     if (index.isValid()) {
-        QPointer<GrpcClient> server = _tableModel->getServer(index.row());
+        QPointer<GrpcDevice> server = _tableModel->getServer(index.row());
         if (server) {
             if (text == "Connect") {
                 server->connectToServer();

@@ -71,17 +71,17 @@ void TableModel::addServer(const QString &ip, const quint16 port)
 
     beginInsertRows(QModelIndex(), _servers.size(), _servers.size());
 
-    QPointer<GrpcClient> server = new GrpcClient();
+    QPointer<GrpcDevice> server = new GrpcDevice();
     server->setIp(ip);
     server->setPort(port);
     _servers.append(server);
 
     // Можно и dataChange
-    connect(server.data(), &GrpcClient::connectionStateChanged, this, [this]() {
+    connect(server.data(), &GrpcDevice::connectionStateChanged, this, [this]() {
         emit layoutChanged();
     });
 
-    connect(server.data(), &GrpcClient::lastPingTimeChanged, this, [this]() {
+    connect(server.data(), &GrpcDevice::lastPingTimeChanged, this, [this]() {
         emit layoutChanged();
     });
 
@@ -97,7 +97,7 @@ Qt::ItemFlags TableModel::flags(const QModelIndex &index) const
     return flags;
 }
 
-QPointer<GrpcClient> TableModel::getServer(const int row) const
+QPointer<GrpcDevice> TableModel::getServer(const int row) const
 {
     if (row >= 0 && row < _servers.size()) {
         return _servers.at(row);

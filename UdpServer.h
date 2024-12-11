@@ -20,7 +20,6 @@ public:
     void stopBroadcast();
 
     void setBroadcastPort(const quint16 newBroadcastPort);
-
     void setServerIp(const QString &newServerIp);
 
 private:

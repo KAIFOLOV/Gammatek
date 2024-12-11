@@ -13,6 +13,7 @@ ServerWidget::ServerWidget(QWidget *parent) :
     _logTextEdit->setReadOnly(true);
     mainLayout->addWidget(_logTextEdit);
 
+    // port settings
     {
         QHBoxLayout *portLayout = new QHBoxLayout(this);
 

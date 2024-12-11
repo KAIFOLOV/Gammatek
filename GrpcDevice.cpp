@@ -1,15 +1,15 @@
-#include "GrpcClient.h"
+#include "GrpcDevice.h"
 
 #include <QDebug>
 #include <QDateTime>
 
-GrpcClient::GrpcClient(QObject *parent) : QObject { parent }, _pingTimer { new QTimer(this) }
+GrpcDevice::GrpcDevice(QObject *parent) : QObject { parent }, _pingTimer { new QTimer(this) }
 {
     _pingTimer->setInterval(5000);
-    connect(_pingTimer, &QTimer::timeout, this, &GrpcClient::pingServer);
+    connect(_pingTimer, &QTimer::timeout, this, &GrpcDevice::pingServer);
 }
 
-void GrpcClient::connectToServer()
+void GrpcDevice::connectToServer()
 {
     if (_isGrpcConnected) {
         qInfo() << "Already connected to gRPC server.";
@@ -30,7 +30,7 @@ void GrpcClient::connectToServer()
     emit connectionStateChanged();
 }
 
-void GrpcClient::disconnectFromServer()
+void GrpcDevice::disconnectFromServer()
 {
     if (!_isGrpcConnected) {
         qInfo() << "Already disconnected from gRPC server.";
@@ -47,7 +47,7 @@ void GrpcClient::disconnectFromServer()
     emit connectionStateChanged();
 }
 
-void GrpcClient::pingServer()
+void GrpcDevice::pingServer()
 {
     if (!_isGrpcConnected) {
         qWarning() << "gRPC client is not connected!";
@@ -81,32 +81,32 @@ void GrpcClient::pingServer()
     }
 }
 
-QString GrpcClient::ip() const
+QString GrpcDevice::ip() const
 {
     return _ip;
 }
 
-quint16 GrpcClient::port() const
+quint16 GrpcDevice::port() const
 {
     return _port;
 }
 
-QString GrpcClient::lastPingTime() const
+QString GrpcDevice::lastPingTime() const
 {
     return _lastPingTime;
 }
 
-bool GrpcClient::isGrpcConnected() const
+bool GrpcDevice::isGrpcConnected() const
 {
     return _isGrpcConnected;
 }
 
-void GrpcClient::setIp(const QString &newIp)
+void GrpcDevice::setIp(const QString &newIp)
 {
     _ip = newIp;
 }
 
-void GrpcClient::setPort(quint16 newPort)
+void GrpcDevice::setPort(quint16 newPort)
 {
     _port = newPort;
 }
