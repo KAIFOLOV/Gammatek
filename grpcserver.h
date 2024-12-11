@@ -32,7 +32,6 @@ protected:
 
 private:
     QString _serverIp { "127.0.0.1" };
-    QString _clientIp;
     quint16 _serverPort { 50001 };
 
     std::shared_ptr<grpc::Channel> _channel;

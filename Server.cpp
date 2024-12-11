@@ -28,6 +28,9 @@ int main(int argc, char *argv[])
     QObject::connect(serverWidget, &ServerWidget::startBroadcast, serverLogic.get(),
                      &ServerLogic::startUdpBroadcast);
 
+    QObject::connect(serverWidget, &ServerWidget::startBroadcast, grpcServer,
+                     &GrpcServer::setServerPort);
+
     QObject::connect(serverWidget, &ServerWidget::startGrpc, serverLogic.get(),
                      &ServerLogic::startGrpcServer);
 

@@ -1,28 +1,28 @@
 #ifndef CLIENTLOGIC_H
 #define CLIENTLOGIC_H
 
-#include "GrpcClient.h"
+#include "TableModel.h"
 #include "UdpClient.h"
 
 #include <QObject>
 
+/// Бизнесс логика
 class ClientLogic : public QObject
 {
     Q_OBJECT
 public:
-    explicit ClientLogic(QPointer<GrpcClient> grpcClient,
-                         QPointer<UdpClient> udpClient,
+    explicit ClientLogic(QPointer<UdpClient> udpClient,
+                         QPointer<TableModel> model,
                          QObject *parent = nullptr);
 
     Q_SIGNAL void stopBroadcast();
     Q_SIGNAL void resumeBroadcast();
 
-    Q_SLOT void onServerInfoReceived(const QString &serverIp, quint16 serverPort);
-    Q_SLOT void onPingServer();
+    Q_SLOT void onServerInfoReceived(const QString &serverIp, const quint16 serverPort);
 
 private:
-    QPointer<GrpcClient> _grpcClient;
     QPointer<UdpClient> _udpClient;
+    QPointer<TableModel> _model;
 };
 
 #endif // CLIENTLOGIC_H

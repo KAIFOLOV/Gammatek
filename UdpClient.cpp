@@ -7,6 +7,10 @@ UdpClient::UdpClient(QObject *parent) : QObject(parent), _udpSocket { new QUdpSo
 
 void UdpClient::startListening()
 {
+    _udpSocket = new QUdpSocket(this);
+
+    connect(_udpSocket, &QUdpSocket::readyRead, this, &UdpClient::onDatagramReceived);
+
     if (!_udpSocket->bind(QHostAddress::Any, _udpPort, QUdpSocket::ShareAddress)) {
         qCritical() << "Failed to bind UDP socket to port" << _udpPort;
         return;
@@ -43,16 +47,7 @@ void UdpClient::pauseBroadcast()
 {
     qInfo() << "Pausing broadcast for";
     _udpSocket->close();
-}
-
-void UdpClient::resumeBroadcast()
-{
-    qInfo() << "Resuming broadcast.";
     delete _udpSocket;
-    _udpSocket = new QUdpSocket(this);
-
-    connect(_udpSocket, &QUdpSocket::readyRead, this, &UdpClient::onDatagramReceived);
-    startListening();
 }
 
 void UdpClient::setUdpPort(const quint16 newUdpPort)

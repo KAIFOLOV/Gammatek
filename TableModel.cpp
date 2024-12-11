@@ -4,9 +4,7 @@
 #include <QTime>
 
 TableModel::TableModel(QObject *parent) : QAbstractTableModel(parent)
-{
-    addServer("172.16.1.1");
-}
+{}
 
 int TableModel::rowCount(const QModelIndex &parent) const
 {
@@ -17,7 +15,7 @@ int TableModel::rowCount(const QModelIndex &parent) const
 int TableModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return 4; // IP, Last Ping Time, Status, Action
+    return 4;
 }
 
 QVariant TableModel::data(const QModelIndex &index, int role) const
@@ -26,17 +24,17 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    const ServerData &server = _servers[index.row()];
+    const auto server = _servers[index.row()];
     if (role == Qt::DisplayRole) {
         switch (index.column()) {
         case 0:
-            return server.adress;
+            return QString(server->ip() % ":" % QString::number(server->port()));
         case 1:
-            return server.lastPingTime;
+            return server->lastPingTime();
         case 2:
-            return server.status;
+            return server->isGrpcConnected() ? "ON" : "OFF";
         case 3:
-            return server.status == "Offline" ? "Connect" : "Disconnect";
+            return server->isGrpcConnected() ? "Disconnect" : "Connect";
         }
     }
 
@@ -62,69 +60,47 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
     return QVariant();
 }
 
-void TableModel::addServer(const QString &adress)
+void TableModel::addServer(const QString &ip, const quint16 port)
 {
+    for (const auto &server : _servers) {
+        if (server->ip() == ip && server->port() == port) {
+            qInfo() << "Server with IP" << ip << "and port" << port << "already exists!";
+            return;
+        }
+    }
+
     beginInsertRows(QModelIndex(), _servers.size(), _servers.size());
-    ServerData server;
-    server.adress = adress;
-    server.status = "Offline";
-    server.lastPingTime = "-";
-    server.pingTimer = nullptr;
+
+    QPointer<GrpcClient> server = new GrpcClient();
+    server->setIp(ip);
+    server->setPort(port);
     _servers.append(server);
+
+    // Можно и dataChange
+    connect(server.data(), &GrpcClient::connectionStateChanged, this, [this]() {
+        emit layoutChanged();
+    });
+
+    connect(server.data(), &GrpcClient::lastPingTimeChanged, this, [this]() {
+        emit layoutChanged();
+    });
+
     endInsertRows();
 }
 
-void TableModel::startPing(const int row)
+Qt::ItemFlags TableModel::flags(const QModelIndex &index) const
 {
-    ServerData &server = _servers[row];
-    if (server.pingTimer)
-        return; // Если уже пингуется, ничего не делаем
-
-    // Создаем таймер для пинга каждые 5 секунд
-    server.pingTimer = new QTimer(this);
-    server.pingTimer->setInterval(5000);
-    connect(server.pingTimer, &QTimer::timeout, this, [this, row]() {
-        pingServer(row);
-    });
-    server.pingTimer->start();
-}
-
-void TableModel::stopPing(const int row)
-{
-    ServerData &server = _servers[row];
-    if (server.pingTimer) {
-        server.pingTimer->stop();
-        delete server.pingTimer;
-        server.pingTimer = nullptr;
+    Qt::ItemFlags flags = QAbstractTableModel::flags(index);
+    if (index.column() == 3) {
+        flags |= Qt::ItemIsEditable;
     }
+    return flags;
 }
 
-void TableModel::pingServer(const int row)
+QPointer<GrpcClient> TableModel::getServer(const int row) const
 {
-    ServerData &server = _servers[row];
-
-    // Пример: обновляем время последнего пинга
-    server.lastPingTime = QTime::currentTime().toString("hh:mm");
-
-    // Здесь нужно добавить вызов функции Ping через gRPC или другую технологию
-
-    // Обновляем данные в таблице (только колонку с временем пинга)
-    emit dataChanged(index(row, 1), index(row, 1));
-}
-
-void TableModel::toggleConnectDisconnect(int row, QPushButton *button)
-{
-    ServerData &server = _servers[row];
-
-    if (server.status == "Offline") {
-        startPing(row);
-        server.status = "Online";
-        button->setText("Disconnect");
-    } else {
-        stopPing(row);
-        server.status = "Offline";
-        button->setText("Connect");
+    if (row >= 0 && row < _servers.size()) {
+        return _servers.at(row);
     }
-
-    emit dataChanged(index(row, 2), index(row, 2)); // Обновить статус
+    return nullptr;
 }

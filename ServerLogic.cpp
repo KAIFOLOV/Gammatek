@@ -26,7 +26,6 @@ ServerLogic::~ServerLogic()
 
 void ServerLogic::startGrpcServer()
 {
-    // Запускаем gRPC сервер
     _grpcServer->start();
 
     appendToLog(tr("gRPC server started"));

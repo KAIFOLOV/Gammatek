@@ -14,7 +14,6 @@ public:
     Q_SIGNAL void serverInfoReceived(const QString &serverIp, quint16 serverPort);
 
     Q_SLOT void onDatagramReceived();
-    Q_SLOT void resumeBroadcast();
 
     void startListening();
     void pauseBroadcast();
