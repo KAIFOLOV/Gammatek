@@ -1,5 +1,7 @@
 #include "GrpcServer.h"
 
+#include "grpcpp/ext/proto_server_reflection_plugin.h"
+
 #include <QDebug>
 
 grpc::Status MaintainingServiceImpl::Ping(grpc::ServerContext *context,
@@ -9,7 +11,7 @@ grpc::Status MaintainingServiceImpl::Ping(grpc::ServerContext *context,
     std::string client_ip = context->peer();
     qInfo() << "Send Ping Responce to client:" << QString::fromStdString(client_ip);
 
-    std::string responseMessage = "1";
+    std::string responseMessage = "Ping";
 
     response->set_response(responseMessage);
 
@@ -26,10 +28,12 @@ void GrpcServer::run()
     std::string server_address = _serverIp.toStdString() + ":" + std::to_string(_serverPort);
 
     MaintainingServiceImpl service;
+    grpc::reflection::InitProtoReflectionServerBuilderPlugin();
 
     grpc::ServerBuilder builder;
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
     builder.RegisterService(&service);
+
 
     _server = builder.BuildAndStart();
     qInfo() << "gRPC Server listening on" << QString::fromStdString(server_address);

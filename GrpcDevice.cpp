@@ -55,7 +55,7 @@ void GrpcDevice::pingServer()
     }
 
     PingRequest pingRequest;
-    pingRequest.set_clientip("1");
+    pingRequest.set_clientip("Ping");
 
     PingResponse pingResponse;
     grpc::ClientContext context;
